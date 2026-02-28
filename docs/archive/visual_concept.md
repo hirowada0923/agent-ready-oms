@@ -4,7 +4,7 @@
 
 ## 1. ビジュアルイメージ (Mockup)
 
-![OMS Soft Modern Mockup](/Users/hiro/.gemini/antigravity/brain/1693ca81-a64d-4fb0-b99b-46e0483a425d/oms_soft_modern_mockup_1772249933389.png)
+![OMS Soft Modern Mockup](../assets/oms_soft_modern_mockup_1772249933389.png)
 
 ## 2. デザインの柱 (Design Pillars)
 
