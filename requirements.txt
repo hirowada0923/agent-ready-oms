@@ -4,4 +4,5 @@ sqlalchemy
 jinja2
 python-dotenv
 python-multipart
+mcp
 # sqlite3 is part of standard library, no need to list here
