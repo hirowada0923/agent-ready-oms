@@ -37,8 +37,8 @@ class MasterService:
         return db.query(Customer).all()
 
     @staticmethod
-    def create_customer(db: Session, name: str, address: str, contact: str):
-        customer = Customer(name=name, address=address, contact=contact)
+    def create_customer(db: Session, name: str, address: str, contact: str, name_kana: str = None):
+        customer = Customer(name=name, name_kana=name_kana, address=address, contact=contact)
         db.add(customer)
         db.commit()
         db.refresh(customer)

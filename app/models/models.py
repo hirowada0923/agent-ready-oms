@@ -19,6 +19,7 @@ class Customer(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True, nullable=False)
+    name_kana = Column(String)
     address = Column(String, nullable=False)
     contact = Column(String)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), default=func.now())

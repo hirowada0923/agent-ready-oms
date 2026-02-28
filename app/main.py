@@ -100,6 +100,10 @@ async def customers_page(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse("customers.html", {"request": request, "customers": customers})
 
 @app.post("/master/customers/create")
-async def create_customer(name: str = Form(...), address: str = Form(...), contact: str = Form(...), db: Session = Depends(get_db)):
-    MasterService.create_customer(db, name, address, contact)
+async def create_customer(name: str = Form(...), name_kana: str = Form(None), address: str = Form(...), contact: str = Form(...), db: Session = Depends(get_db)):
+    MasterService.create_customer(db, name, address, contact, name_kana)
+    return RedirectResponse(url="/master/customers", status_code=303)
+@app.post("/master/customers/{customer_id}/delete")
+async def delete_customer_endpoint(customer_id: int, db: Session = Depends(get_db)):
+    MasterService.delete_customer(db, customer_id)
     return RedirectResponse(url="/master/customers", status_code=303)

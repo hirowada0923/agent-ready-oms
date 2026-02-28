@@ -30,6 +30,12 @@
                 </div>
                 <div>
                     <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">かな名称</label>
+                    <input type="text" name="name_kana" placeholder="やまだ たろう..."
+                        class="w-full bg-white/50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none">
+                </div>
+                <div>
+                    <label
                         class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">住所</label>
                     <input type="text" name="address" required placeholder="東京都渋谷区..."
                         class="w-full bg-white/50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none">
@@ -60,6 +66,8 @@
                         <tr class="bg-white/30">
                             <th class="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">顧客名
                             </th>
+                            <th class="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">かな名称
+                            </th>
                             <th class="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">住所
                             </th>
                             <th class="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">連絡先
@@ -82,19 +90,22 @@
                                 </div>
                             </td>
                             <td class="px-8 py-6">
+                                <span class="text-sm text-slate-600">{{ customer.name_kana if customer.name_kana else '-' }}</span>
+                            </td>
+                            <td class="px-8 py-6">
                                 <span class="text-sm text-slate-500 italic">{{ customer.address }}</span>
                             </td>
                             <td class="px-8 py-6">
                                 <span class="text-xs font-bold text-indigo-500 font-mono">{{ customer.contact }}</span>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <button class="text-slate-300 hover:text-indigo-500 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                                    </svg>
-                                </button>
+                                <form method="post" action="/master/customers/{{ customer.id }}/delete" 
+                                      onsubmit="return confirm('この顧客「' + '{{ customer.name }}' + '」を削除してもよろしいですか？');" 
+                                      style="display:inline;">
+                                    <button type="submit" class="text-red-400 hover:text-red-600 transition-colors font-bold text-sm">
+                                        削除
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
