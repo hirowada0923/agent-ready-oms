@@ -12,7 +12,9 @@ description: Git/GitHubを使用した開発ワークフローの標準プロセ
 すべての機能追加・バグ修正は以下の手順に従います。
 GitHub との連携には `gh` CLI を使用します。
 
-1. **要件分析**: Issue番号が提供された場合、`gh issue view <番号>` で要件を取得し、影響範囲を特定する。
+1. **要件分析**:
+   - Issue番号が提供された場合: `gh issue view <番号>` で要件を取得し、影響範囲を特定する。
+   - Issue番号がない場合: タスク内容をもとに `gh issue create --title "<タイトル>" --body "<要件詳細>"` で Issue を作成し、以降の作業を紐づける。
 2. **ブランチ作成**: `main` から命名規則（セクション2）に従いブランチを作成する。
    ```
    git checkout -b feature/customer-search
