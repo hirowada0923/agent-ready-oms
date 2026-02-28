@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}顧客マスタ - OMS Core{% endblock %}
+{% block page_title %}顧客マスタ{% endblock %}
+{% block page_subtitle %}取引先情報の登録と、連絡先データベースの管理を行います。{% endblock %}
+
+{% block content %}
+<div class="flex flex-col xl:flex-row gap-10">
+    <!-- Left: Customer Registration Form -->
+    <div class="xl:w-80 flex flex-col gap-6">
+        <div class="glass-card p-8 rounded-[2.5rem] border-white/60">
+            <div class="flex items-center space-x-3 mb-8">
+                <div
+                    class="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <h2 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">顧客登録</h2>
+            </div>
+
+            <form action="/master/customers/create" method="post" class="space-y-6">
+                <div>
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">顧客名</label>
+                    <input type="text" name="name" required placeholder="山田 太郎..."
+                        class="w-full bg-white/50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none">
+                </div>
+                <div>
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">住所</label>
+                    <input type="text" name="address" required placeholder="東京都渋谷区..."
+                        class="w-full bg-white/50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">連絡先 /
+                        メール</label>
+                    <input type="text" name="contact" placeholder="090-0000-0000 / example@..."
+                        class="w-full bg-white/50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none">
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full bg-slate-900 text-white py-5 rounded-[1.5rem] font-bold hover:bg-emerald-600 hover:scale-[1.02] transition-all shadow-2xl shadow-slate-900/10 active:scale-95">
+                        顧客情報を保存
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right: Customer Database -->
+    <div class="flex-grow">
+        <div class="glass-card rounded-[2.5rem] border-white/60 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white/30">
+                            <th class="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">顧客名
+                            </th>
+                            <th class="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">住所
+                            </th>
+                            <th class="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest">連絡先
+                            </th>
+                            <th
+                                class="px-8 py-6 text-[11px] font-bold text-slate-400 uppercase tracking-widest text-right">
+                                操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100/50">
+                        {% for customer in customers %}
+                        <tr class="group hover:bg-white/20 transition-all">
+                            <td class="px-8 py-6">
+                                <div class="flex items-center space-x-4">
+                                    <div
+                                        class="w-10 h-10 rounded-xl glossy-gradient border border-white/40 flex items-center justify-center text-slate-400 font-display font-bold text-xs uppercase">
+                                        {{ customer.name[:2] }}
+                                    </div>
+                                    <span class="font-display font-bold text-slate-800">{{ customer.name }}</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span class="text-sm text-slate-500 italic">{{ customer.address }}</span>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span class="text-xs font-bold text-indigo-500 font-mono">{{ customer.contact }}</span>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <button class="text-slate-300 hover:text-indigo-500 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if not customers %}
+            <div class="p-20 text-center border-t border-slate-100/50 italic text-slate-400 font-display font-medium">
+                顧客データが見つかりません。
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

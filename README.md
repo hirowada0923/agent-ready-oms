@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Agent-Ready Order Management System (OMS)
 
-## Getting Started
+Python (FastAPI) ベースの、AIエージェントとの協調開発に最適化された受注管理システムです。
 
-First, run the development server:
+## 🌟 特徴
+- **Modern UI**: グラスモーフィズム（Soft Modern）を採用したプレミアムなデザイン。
+- **Agent-Ready**: 開発規約（Skill）と物理的な制約（MCP）により、AIエージェントによる安全な自動改修が可能。
+- **Robustness**: FastAPI + SQLAlchemy による型安全で安定したバックエンド。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠 セットアップ
+1. **Python 環境の構築**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+2. **データの初期化**:
+   ```bash
+   python seed.py
+   ```
+3. **サーバー起動**:
+   ```bash
+   uvicorn app.main:app --reload
+   ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🤖 AIエージェントによる開発
+本プロジェクトをAIエージェントが開発・メンテナンスする際は、必ず以下のドキュメントを確認してください。
+- [AIエージェント向け引き継ぎガイド](docs/HANDOVER_FOR_AGENTS.md)
+- [開発規約 (oms-dev-governance)](.agents/skills/oms-dev-governance/SKILL.md)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📁 主要構成
+- `app/`: アプリケーションコード（モデル、サービス、テンプレート）
+- `.agents/`: AIエージェント用のメタデータとスキル定義
+- `mcp/`: 開発支援・安全検証用MCPサーバー
+- `docs/`: 設計文書・アーカイブ

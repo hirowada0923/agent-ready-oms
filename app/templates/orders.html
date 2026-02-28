@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}受注管理 - OMS Core{% endblock %}
+{% block page_title %}受注管理{% endblock %}
+{% block page_subtitle %}新規受注の登録と、既存注文のステータス追跡・更新を行います。{% endblock %}
+
+{% block content %}
+<div class="flex flex-col xl:flex-row gap-10 h-auto xl:h-[calc(100vh-200px)]">
+    <!-- Left: Order Creation Form -->
+    <div class="xl:w-80 2xl:w-96 flex flex-col gap-6 h-full">
+        <div class="glass-card p-8 rounded-[2.5rem] flex flex-col h-full border-white/60">
+            <div class="flex items-center space-x-3 mb-8">
+                <div
+                    class="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+                <h2
+                    class="text-xl font-display font-bold text-slate-900 tracking-tight text-[11px] uppercase tracking-widest text-slate-400">
+                    受注登録</h2>
+            </div>
+
+            <form action="/orders/create" method="post" class="flex flex-col flex-grow">
+                <div class="space-y-6 flex-grow overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Customer Select -->
+                    <div>
+                        <label
+                            class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">顧客選択</label>
+                        <select name="customer_id"
+                            class="w-full bg-white/50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none appearance-none cursor-pointer"
+                            required>
+                            <option value="" disabled selected>顧客を選択してください</option>
+                            {% for customer in customers %}
+                            <option value="{{ customer.id }}">{{ customer.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Product List -->
+                    <div>
+                        <label
+                            class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3 px-1">商品選択</label>
+                        <div class="space-y-3">
+                            {% for product in products %}
+                            <div
+                                class="glass-card bg-white/30 p-4 rounded-2xl border border-white/40 group hover:border-indigo-500/30 transition-all">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <p class="font-bold text-slate-800 text-sm leading-tight">{{ product.name }}</p>
+                                        <p class="text-[10px] font-bold text-indigo-500 mt-1">¥{{
+                                            "{:,}".format(product.price) }}</p>
+                                    </div>
+                                    <div
+                                        class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full font-bold">
+                                        在庫数: {{ product.stock_quantity }}</div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <input type="hidden" name="product_ids" value="{{ product.id }}">
+                                    <input type="number" name="quantities" value="0" min="0"
+                                        max="{{ product.stock_quantity }}"
+                                        class="w-full bg-white/80 border border-slate-100 rounded-xl text-xs py-2 px-3 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all font-bold text-slate-700"
+                                        placeholder="0">
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-8 mt-auto">
+                    <button type="submit"
+                        class="w-full bg-slate-900 text-white py-5 rounded-[1.5rem] font-bold hover:bg-indigo-600 hover:scale-[1.02] transition-all shadow-2xl shadow-slate-900/10 active:scale-95">
+                        注文を確定する
+                    </button>
+                    <p class="text-[9px] text-center text-slate-400 mt-4 font-medium uppercase tracking-widest">
+                        確定前に在庫数を確認してください</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right: Order History & Filter -->
+    <div class="flex-grow flex flex-col gap-6 h-full">
+        <!-- Filter Bar -->
+        <div class="glass-card p-3 rounded-3xl flex items-center justify-between border-white/50">
+            <div class="flex items-center p-1 bg-slate-100/50 rounded-2xl space-x-1">
+                {% for s in ["すべて", "未対応", "準備中", "出荷済", "完了"] %}
+                <a href="/orders?status={{ s }}"
+                    class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all
+                   {% if current_status == s %} bg-white text-indigo-600 shadow-sm border border-slate-200/50 {% else %} text-slate-400 hover:text-slate-600 {% endif %}">
+                    {{ s }}
+                </a>
+                {% endfor %}
+            </div>
+            <div class="pr-4 text-[11px] font-bold text-slate-300 uppercase tracking-widest">
+                該当件数: {{ orders|length }}
+            </div>
+        </div>
+
+        <!-- Orders Grid/Table -->
+        <div class="flex-grow overflow-y-auto custom-scrollbar pr-4 -mr-4">
+            <div class="grid grid-cols-1 gap-4">
+                {% for order in orders %}
+                <div
+                    class="glass-card p-6 rounded-[2rem] border-white/50 flex flex-col md:flex-row md:items-center justify-between group hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                    <div class="flex items-center space-x-6">
+                        <div
+                            class="w-14 h-14 rounded-2xl glossy-gradient border border-white/40 flex items-center justify-center text-slate-400 font-display font-bold text-xs">
+                            #{{ order.id }}
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-3 mb-1">
+                                <h4 class="font-display font-bold text-slate-900 text-lg">{{ order.customer.name }}</h4>
+                                <span class="text-[10px] font-mono text-slate-400">{{ order.order_number }}</span>
+                            </div>
+                            <div
+                                class="flex items-center space-x-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                                <span>{{ order.created_at.strftime('%Y-%m-%d %H:%M') if order.created_at else ''
+                                    }}</span>
+                                <span class="text-indigo-500">¥{{ "{:,}".format(order.total_amount) }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 md:mt-0 flex flex-col md:flex-row items-center gap-6">
+                        <!-- Status Badge -->
+                        <div class="flex flex-col items-center">
+                            <span class="px-5 py-2 rounded-full text-[10px] font-bold tracking-[0.1em] uppercase shadow-sm border border-white/60
+                                {% if order.status == '未対応' %} bg-amber-500/10 text-amber-600
+                                {% elif order.status == '完了' %} bg-emerald-500/10 text-emerald-600
+                                {% elif order.status == '準備中' %} bg-sky-500/10 text-sky-600
+                                {% elif order.status == '出荷済' %} bg-indigo-500/10 text-indigo-600
+                                {% else %} bg-slate-500/10 text-slate-500 {% endif %}">
+                                {{ order.status }}
+                            </span>
+                        </div>
+
+                        <!-- Mini Status Form -->
+                        <form action="/orders/{{ order.id }}/status" method="post" class="relative group/select">
+                            <select name="status" onchange="this.form.submit()"
+                                class="bg-white/50 border border-slate-100 rounded-xl text-[10px] font-bold px-4 py-3 pr-8 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all appearance-none text-slate-500 cursor-pointer">
+                                <option value="" disabled selected>ステータス更新</option>
+                                <option value="未対応">未対応</option>
+                                <option value="準備中">準備中</option>
+                                <option value="出荷済">出荷済</option>
+                                <option value="完了">完了</option>
+                                <option value="キャンセル">キャンセル</option>
+                            </select>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-3 w-3 absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <div class="glass-card p-20 rounded-[3rem] text-center border-white/50 border-dashed border-2">
+                    <p class="text-slate-400 font-display font-medium text-lg italic">受注データが見つかりません。</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}

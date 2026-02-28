@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}OMS Python Edition{% endblock %}</title>
+    <!-- Modern Typography: Outfit & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: {
+                            DEFAULT: 'rgba(255, 255, 255, 0.7)',
+                            dark: 'rgba(255, 255, 255, 0.4)',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: radial-gradient(circle at top right, #eef2ff, #fdf2f8, #f8fafc);
+            background-attachment: fixed;
+        }
+
+        .sidebar-item-active {
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glossy-gradient {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.1));
+        }
+    </style>
+</head>
+
+<body class="font-sans text-slate-900 min-h-screen flex text-sm lg:text-base">
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 glass-card h-screen fixed left-0 top-0 flex flex-col z-50 border-r border-slate-200/50">
+        <div class="p-8">
+            <h1
+                class="font-display font-bold text-2xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-rose-500">
+                OMS Core
+            </h1>
+            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Python Edition</p>
+        </div>
+
+        <nav class="flex-grow px-4 space-y-2 mt-4">
+            <a href="/"
+                class="flex items-center space-x-3 w-full p-4 rounded-2xl text-slate-600 hover:bg-white/50 transition-all font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+                <span>ダッシュボード</span>
+            </a>
+            <a href="/orders"
+                class="flex items-center space-x-3 w-full p-4 rounded-2xl text-slate-600 hover:bg-white/50 transition-all font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span>受注管理</span>
+            </a>
+
+            <div class="pt-4 pb-2 px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest font-display">
+                マスタ管理</div>
+
+            <a href="/master/products"
+                class="flex items-center space-x-3 w-full p-4 rounded-2xl text-slate-600 hover:bg-white/50 transition-all font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+                <span>商品マスタ</span>
+            </a>
+            <a href="/master/customers"
+                class="flex items-center space-x-3 w-full p-4 rounded-2xl text-slate-600 hover:bg-white/50 transition-all font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <span>顧客マスタ</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-200/50">
+            <div class="flex items-center space-x-3 p-3 rounded-2xl glass-card glossy-gradient">
+                <div class="w-8 h-8 rounded-xl bg-indigo-500 flex items-center justify-center text-white font-bold">H
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-800">Hiro System</p>
+                    <p class="text-[10px] text-slate-500">システム管理者</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="ml-64 flex-grow p-10 min-h-screen">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h2 class="text-3xl font-display font-bold text-slate-900 tracking-tight">{% block page_title %}{%
+                    endblock %}</h2>
+                <p class="text-slate-500 mt-1">{% block page_subtitle %}{% endblock %}</p>
+            </div>
+            <!-- Search / Tool bar could go here -->
+            <div class="flex items-center space-x-4">
+                <button
+                    class="w-10 h-10 rounded-2xl glass-card flex items-center justify-center text-slate-500 hover:text-indigo-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        {% block content %}{% endblock %}
+
+        <footer
+            class="mt-20 border-t border-slate-200/50 pt-8 text-slate-400 text-[11px] font-medium uppercase tracking-[0.2em]">
+            &copy; 2024 OMS Core - Python Edition. All rights reserved.
+        </footer>
+    </main>
+
+    <script>
+        // サイドバーの現在地をアクティブにする簡易スクリプト
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('nav a').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('sidebar-item-active');
+            }
+        });
+    </script>
+</body>
+
+</html>

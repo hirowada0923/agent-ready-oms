@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}商品マスタ - OMS Core{% endblock %}
+{% block page_title %}商品マスタ{% endblock %}
+{% block page_subtitle %}取扱商品の登録と、在庫レベルのリアルタイム調整を行います。{% endblock %}
+
+{% block content %}
+<div class="flex flex-col xl:flex-row gap-10">
+    <!-- Left: Product Registration Form -->
+    <div class="xl:w-80 flex flex-col gap-6">
+        <div class="glass-card p-8 rounded-[2.5rem] border-white/60">
+            <div class="flex items-center space-x-3 mb-8">
+                <div
+                    class="w-10 h-10 rounded-2xl bg-rose-500 flex items-center justify-center text-white shadow-lg shadow-rose-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                </div>
+                <h2 class="text-[11px] font-bold uppercase tracking-widest text-slate-400">商品登録</h2>
+            </div>
+
+            <form action="/master/products/create" method="post" class="space-y-6">
+                <div>
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">商品名</label>
+                    <input type="text" name="name" required placeholder="MacBook Pro..."
+                        class="w-full bg-white/50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">単価
+                        (¥)</label>
+                    <input type="number" name="price" required placeholder="248000"
+                        class="w-full bg-white/50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none">
+                </div>
+                <div>
+                    <label
+                        class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">初期在庫</label>
+                    <input type="number" name="stock" required placeholder="10"
+                        class="w-full bg-white/50 border border-slate-200 rounded-2xl p-4 text-slate-700 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all outline-none">
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit"
+                        class="w-full bg-slate-900 text-white py-5 rounded-[1.5rem] font-bold hover:bg-rose-600 hover:scale-[1.02] transition-all shadow-2xl shadow-slate-900/10 active:scale-95">
+                        商品を保存する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Right: Inventory Grid -->
+    <div class="flex-grow">
+        <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+            {% for product in products %}
+            <div
+                class="glass-card p-8 rounded-[2.5rem] border-white/60 relative overflow-hidden group hover:shadow-2xl transition-all duration-500">
+                <div
+                    class="absolute -top-10 -right-10 w-32 h-32 bg-slate-500/5 rounded-full blur-2xl group-hover:bg-rose-500/10 transition-all">
+                </div>
+
+                <div class="relative z-10 flex flex-col h-full">
+                    <div class="flex justify-between items-start mb-6">
+                        <div
+                            class="w-12 h-12 rounded-2xl glossy-gradient border border-white/40 flex items-center justify-center text-slate-400 font-display font-bold text-[10px]">
+                            #{{ product.id }}
+                        </div>
+                        <div
+                            class="bg-indigo-500 text-white px-4 py-1.5 rounded-full text-[10px] font-bold shadow-lg shadow-indigo-500/20">
+                            ¥{{ "{:,}".format(product.price) }}
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-display font-bold text-slate-900 mb-2">{{ product.name }}</h3>
+
+                    <div class="mt-auto pt-6 border-t border-slate-100 flex flex-col gap-4">
+                        <div class="flex justify-between items-center px-1">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">現在庫</span>
+                            <span
+                                class="text-lg font-display font-bold {% if product.stock_quantity < 5 %}text-rose-600 animate-pulse{% else %}text-slate-900{% endif %}">
+                                {{ product.stock_quantity }} <span
+                                    class="text-xs font-normal text-slate-400 ml-1">点</span>
+                            </span>
+                        </div>
+
+                        <!-- Stock Adjustment Form -->
+                        <form action="/master/products/{{ product.id }}/stock" method="post"
+                            class="flex items-center gap-3">
+                            <div class="relative flex-grow">
+                                <input type="number" name="stock" value="{{ product.stock_quantity }}" min="0"
+                                    class="w-full bg-white/40 border border-slate-100 rounded-xl text-xs font-bold py-3 px-4 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-slate-700">
+                            </div>
+                            <button type="submit"
+                                class="bg-white/80 border border-slate-200 p-3 rounded-xl hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-all shadow-sm active:scale-90"
+                                title="在庫を更新">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
