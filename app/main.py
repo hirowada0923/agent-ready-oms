@@ -105,5 +105,8 @@ async def create_customer(name: str = Form(...), name_kana: str = Form(None), ad
     return RedirectResponse(url="/master/customers", status_code=303)
 @app.post("/master/customers/{customer_id}/delete")
 async def delete_customer_endpoint(customer_id: int, db: Session = Depends(get_db)):
-    MasterService.delete_customer(db, customer_id)
-    return RedirectResponse(url="/master/customers", status_code=303)
+    try:
+        MasterService.delete_customer(db, customer_id)
+        return RedirectResponse(url="/master/customers", status_code=303)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
