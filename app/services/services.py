@@ -48,6 +48,11 @@ class MasterService:
     def delete_customer(db: Session, customer_id: int):
         customer = db.query(Customer).filter(Customer.id == customer_id).first()
         if customer:
+            # 受注データの存在チェック
+            order_count = db.query(Order).filter(Order.customer_id == customer_id).count()
+            if order_count > 0:
+                raise Exception(f"この顧客には{order_count}件の受注データが紐づいているため削除できません。")
+            
             db.delete(customer)
             db.commit()
         return customer
