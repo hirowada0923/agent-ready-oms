@@ -5,6 +5,14 @@
 {% block page_subtitle %}取引先情報の登録と、連絡先データベースの管理を行います。{% endblock %}
 
 {% block content %}
+<!-- メッセージ表示エリア -->
+<div id="messageArea" class="hidden mb-6 p-6 rounded-[2rem] border-2 transition-all">
+    <div class="flex items-center space-x-3">
+        <div id="messageIcon" class="w-10 h-10 rounded-xl flex items-center justify-center"></div>
+        <p id="messageText" class="font-bold text-sm"></p>
+    </div>
+</div>
+
 <div class="flex flex-col xl:flex-row gap-10">
     <!-- Left: Customer Registration Form -->
     <div class="xl:w-80 flex flex-col gap-6">
@@ -99,13 +107,10 @@
                                 <span class="text-xs font-bold text-indigo-500 font-mono">{{ customer.contact }}</span>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <form method="post" action="/master/customers/{{ customer.id }}/delete" 
-                                      onsubmit="return confirm('この顧客「' + '{{ customer.name }}' + '」を削除してもよろしいですか？');" 
-                                      style="display:inline;">
-                                    <button type="submit" class="text-red-400 hover:text-red-600 transition-colors font-bold text-sm">
-                                        削除
-                                    </button>
-                                </form>
+                                <button onclick="deleteCustomer({{ customer.id }}, '{{ customer.name }}')"
+                                        class="text-red-400 hover:text-red-600 transition-colors font-bold text-sm">
+                                    削除
+                                </button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -120,4 +125,69 @@
         </div>
     </div>
 </div>
+
+<script>
+function showMessage(message, isSuccess) {
+    const messageArea = document.getElementById('messageArea');
+    const messageIcon = document.getElementById('messageIcon');
+    const messageText = document.getElementById('messageText');
+    
+    if (isSuccess) {
+        messageArea.className = 'mb-6 p-6 rounded-[2rem] border-2 border-emerald-500 bg-emerald-50 transition-all';
+        messageIcon.className = 'w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white';
+        messageIcon.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        `;
+        messageText.className = 'font-bold text-sm text-emerald-800';
+    } else {
+        messageArea.className = 'mb-6 p-6 rounded-[2rem] border-2 border-rose-500 bg-rose-50 transition-all';
+        messageIcon.className = 'w-10 h-10 rounded-xl bg-rose-500 flex items-center justify-center text-white';
+        messageIcon.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        `;
+        messageText.className = 'font-bold text-sm text-rose-800';
+    }
+    
+    messageText.textContent = message;
+    messageArea.classList.remove('hidden');
+    
+    // 5秒後に自動的に非表示
+    setTimeout(() => {
+        messageArea.classList.add('hidden');
+    }, 5000);
+}
+
+async function deleteCustomer(customerId, customerName) {
+    if (!confirm(`この顧客「${customerName}」を削除してもよろしいですか？`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/master/customers/${customerId}/delete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage(data.message, true);
+            // ページをリロードして顧客リストを更新
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showMessage(data.message, false);
+        }
+    } catch (error) {
+        showMessage('削除処理中にエラーが発生しました。', false);
+    }
+}
+</script>
 {% endblock %}

@@ -107,6 +107,6 @@ async def create_customer(name: str = Form(...), name_kana: str = Form(None), ad
 async def delete_customer_endpoint(customer_id: int, db: Session = Depends(get_db)):
     try:
         MasterService.delete_customer(db, customer_id)
-        return RedirectResponse(url="/master/customers", status_code=303)
+        return {"success": True, "message": "顧客を正常に削除しました。"}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return {"success": False, "message": str(e)}
