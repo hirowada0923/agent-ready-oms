@@ -1,9 +1,10 @@
 import os
 import sys
 from mcp.server.fastmcp import FastMCP
-from app.database import SessionLocal
+from app.database import SessionLocal, engine, Base
 from app.services.services import OrderService, MasterService
 from app.models.models import Customer, Product
+from seed import seed_data
 
 # 正式な MCP サーバー (FastMCP を使用)
 # 実行方法: mcp run mcp/oms_dev_mcp.py
@@ -124,6 +125,34 @@ def seed_mock_order(status: str = "未対応", items_count: int = 1, customer_id
         return f"❌ テストデータの生成に失敗しました: {str(e)}"
     finally:
         db.close()
+
+@mcp.tool()
+def reset_test_environment() -> str:
+    """
+    テスト環境のデータベースを完全に初期状態（シードデータのみが存在する状態）にリセットします。
+    エージェントがテスト用データを大量に生成したあとや、データベースが汚染された場合に呼び出してクリーンアップを行います。
+    
+    警告: この操作は現在のデータベース内のすべてのレコード（モックテストで作成した注文や新機能で追加したデータなど）を完全に削除し、初期状態にロールバックします。
+    セキュリティ保護のため、APP_ENV が development, test, local 以外の場合は実行を拒否します。
+    
+    Returns:
+        str: リセット処理の結果メッセージ
+    """
+    try:
+        # 環境チェック (セキュリティ要件)
+        env = os.getenv("APP_ENV", "development").lower()
+        if env not in ["development", "test", "local"]:
+            return f"❌ セキュリティ保護エラー: APP_ENV='{env}' ではリセットツールの実行が許可されていません。開発・テスト環境のみで実行可能です。"
+
+        # テーブルの全削除
+        Base.metadata.drop_all(bind=engine)
+        
+        # シードデータの再投入 (seed_data内で Base.metadata.create_all も実行される)
+        seed_data()
+        
+        return "✅ データベースを初期状態（シード状態）にリセットしました。すべてのモックデータは削除されました。"
+    except Exception as e:
+        return f"❌ テスト環境のリセットに失敗しました: {str(e)}"
 
 if __name__ == "__main__":
     mcp.run()
