@@ -107,7 +107,9 @@
                                 <span class="text-xs font-bold text-indigo-500 font-mono">{{ customer.contact }}</span>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <button onclick="deleteCustomer({{ customer.id }}, '{{ customer.name }}')"
+                                <button data-customer-id="{{ customer.id }}"
+                                        data-customer-name="{{ customer.name }}"
+                                        onclick="deleteCustomer(this)"
                                         class="text-red-400 hover:text-red-600 transition-colors font-bold text-sm">
                                     削除
                                 </button>
@@ -161,7 +163,10 @@ function showMessage(message, isSuccess) {
     }, 5000);
 }
 
-async function deleteCustomer(customerId, customerName) {
+async function deleteCustomer(buttonElement) {
+    const customerId = buttonElement.getAttribute('data-customer-id');
+    const customerName = buttonElement.getAttribute('data-customer-name');
+    
     if (!confirm(`この顧客「${customerName}」を削除してもよろしいですか？`)) {
         return;
     }
@@ -170,9 +175,13 @@ async function deleteCustomer(customerId, customerName) {
         const response = await fetch(`/master/customers/${customerId}/delete`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             }
         });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
         const data = await response.json();
         
