@@ -1,6 +1,9 @@
 import os
 import sys
 from mcp.server.fastmcp import FastMCP
+from app.database import SessionLocal
+from app.services.services import OrderService, MasterService
+from app.models.models import Customer, Product
 
 # 正式な MCP サーバー (FastMCP を使用)
 # 実行方法: mcp run mcp/oms_dev_mcp.py
@@ -61,6 +64,66 @@ def analyze_impact(proposed_paths: list[str]) -> str:
         return "🟢 特筆すべきコアロジックへの影響は見つかりませんでした。通常の改修プロセスを進めてください。"
     
     return "\n".join(impacts)
+
+@mcp.tool()
+def seed_mock_order(status: str = "未対応", items_count: int = 1, customer_id: int = None) -> str:
+    """
+    指定したステータスのテスト用注文データを、必要な関連データ（顧客、商品）を含めてDBに自動生成します。
+    エージェントが自律的に特定のステータス（例：「準備中」や「キャンセル」）でのAPIやUIの挙動をテストする際に利用します。
+    
+    Args:
+        status: 生成する注文のステータス（未対応, 準備中, 出荷済, 完了, キャンセル など）
+        items_count: 注文に含める商品の種類数
+        customer_id: 既存の顧客IDを指定する場合（None の場合はテスト用顧客を自動生成します）
+        
+    Returns:
+        str: 生成された注文のサマリー（注文番号、合計金額、最終ステータス）
+    """
+    db = SessionLocal()
+    try:
+        # 1. 顧客の特定またはモック作成
+        if not customer_id:
+            mock_customer = MasterService.create_customer(
+                db, 
+                name=f"Mock Customer ({status})", 
+                address="Test Address", 
+                contact="090-0000-0000", 
+                name_kana="モック カスタマー"
+            )
+            customer_id = mock_customer.id
+
+        # 2. テスト用商品のモック作成（必要な数だけ）
+        items_data = []
+        for i in range(items_count):
+            mock_product = MasterService.create_product(
+                db, 
+                name=f"Mock Product {i+1} for {status}", 
+                price=1000 * (i + 1), 
+                stock=999 # 在庫不足エラーを避けるために多めに設定
+            )
+            items_data.append({"product_id": mock_product.id, "quantity": 1})
+
+        # 3. 注文の作成
+        new_order = OrderService.create_order(db, customer_id, items_data)
+        
+        # 4. 指定されたステータスへの上書き (デフォルト以外のステータスが指定された場合)
+        if status != "未対応":
+            new_order = OrderService.update_status(db, new_order.id, status)
+            
+        summary = (
+            f"✅ モック注文データの生成に成功しました:\n"
+            f"- 注文番号: {new_order.order_number}\n"
+            f"- ステータス: {new_order.status}\n"
+            f"- 合計金額: {new_order.total_amount} 円\n"
+            f"- 顧客ID: {new_order.customer_id}\n"
+            f"- 作成されたモック商品数: {items_count}"
+        )
+        return summary
+        
+    except Exception as e:
+        return f"❌ テストデータの生成に失敗しました: {str(e)}"
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     mcp.run()
