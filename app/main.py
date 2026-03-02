@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Request, Form, HTTPException
+from fastapi import FastAPI, Depends, Request, Form, HTTPException, Header
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -104,7 +104,14 @@ async def create_customer(name: str = Form(...), name_kana: str = Form(None), ad
     MasterService.create_customer(db, name, address, contact, name_kana)
     return RedirectResponse(url="/master/customers", status_code=303)
 @app.post("/master/customers/{customer_id}/delete")
-async def delete_customer_endpoint(customer_id: int, db: Session = Depends(get_db)):
+async def delete_customer_endpoint(
+    customer_id: int, 
+    x_requested_with: str = Header(None),
+    db: Session = Depends(get_db)
+):
+    if x_requested_with != "XMLHttpRequest":
+        return {"success": False, "message": "不正なリクエストです(CSRF保護)。"}
+        
     try:
         MasterService.delete_customer(db, customer_id)
         return {"success": True, "message": "顧客を正常に削除しました。"}
