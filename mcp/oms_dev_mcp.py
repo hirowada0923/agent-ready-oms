@@ -133,16 +133,21 @@ def reset_test_environment() -> str:
     エージェントがテスト用データを大量に生成したあとや、データベースが汚染された場合に呼び出してクリーンアップを行います。
     
     警告: この操作は現在のデータベース内のすべてのレコード（モックテストで作成した注文や新機能で追加したデータなど）を完全に削除し、初期状態にロールバックします。
+    セキュリティ保護のため、APP_ENV が development, test, local 以外の場合は実行を拒否します。
     
     Returns:
         str: リセット処理の結果メッセージ
     """
     try:
-        # テーブルの全削除と再作成
+        # 環境チェック (セキュリティ要件)
+        env = os.getenv("APP_ENV", "development").lower()
+        if env not in ["development", "test", "local"]:
+            return f"❌ セキュリティ保護エラー: APP_ENV='{env}' ではリセットツールの実行が許可されていません。開発・テスト環境のみで実行可能です。"
+
+        # テーブルの全削除
         Base.metadata.drop_all(bind=engine)
-        Base.metadata.create_all(bind=engine)
         
-        # シードデータの再投入
+        # シードデータの再投入 (seed_data内で Base.metadata.create_all も実行される)
         seed_data()
         
         return "✅ データベースを初期状態（シード状態）にリセットしました。すべてのモックデータは削除されました。"
